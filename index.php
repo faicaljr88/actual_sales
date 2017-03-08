@@ -1,7 +1,7 @@
 <?php
-    error_reporting(0);
+    //error_reporting(0);
     spl_autoload_register(function($class_name){
-        require_once 'controller/' . $class_name . '.php';
+        require_once 'classes/' . $class_name . '.php';
     });
 ?>
 <!DOCTYPE html>
@@ -25,22 +25,24 @@
             $email = $_POST['email'];
             $dataNasc = $_POST['dataNasc'];
             $telefone = $_POST['telefone'];
-            $tolken = $_POST['tolken'];
-            $regiao = $_POST['regiao'];
-            $unidade = $_POST['unidade'];
+            $token = isset($_POST['token'])?$_POST['token']:'92ec877d9401e79dc91e042546bdb55e';
+            $regiao = isset($_POST['regiao'])?$_POST['regiao']:1;
+            $unidade = isset($_POST['unidade'])?$_POST['unidade']:2;
 
             $landing->setNome($nome);
             $landing->setEmail($email);
             $landing->setDataNasc($dataNasc);
-            $landing->setTelefone($Telefone);
+            $landing->setTelefone($telefone);
             $landing->setToken($token);
-            $landing->(int)setRegiao($regiao);
-            $landing->(int)setUnidade($unidade);
+            $landing->setRegiao($regiao);
+            $landing->setUnidade($unidade);
             $landing->calculaScore($regiao, $unidade);
             $landing->calculaIdade($dataNasc);
             $landing->salvar();
         }
+        /*
 
+        */
     ?>
             <div class="row" style="margin:30px 0">
                 <div class="col-lg-3">
@@ -54,86 +56,87 @@
             <div class="row">
                 <div class="col-lg-6" id="form-container">
 
-                    <form id="step_1" class="form-step">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <div class="panel-title">
-                                    Preencha seus dados para receber contato
+                    <form method="post" action="">
+                        <div id="step_1" class="form-step" >
+                            <div class="panel panel-info">
+                                <input type="hidden" name="token" value="92ec877d9401e79dc91e042546bdb55e">
+                                <div class="panel-heading">
+                                    <div class="panel-title">
+                                        Preencha seus dados para receber contato
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="panel-body">
-                                <fieldset>
-                                    <div class="row form-group">
-                                        <div class="col-lg-6">
-                                            <label>Nome Completo</label>
-                                            <input class="form-control" type="text" name="nome">
+                                <div class="panel-body">
+                                    <fieldset>
+                                        <div class="row form-group">
+                                            <div class="col-lg-6">
+                                                <label>Nome Completo</label>
+                                                <input class="form-control" type="text" name="nome">
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                <label>Data de Nascimento</label>
+                                                <input class="form-control" type="text" name="dataNasc">
+                                            </div>
                                         </div>
 
-                                        <div class="col-lg-6">
-                                            <label>Data de Nascimento</label>
-                                            <input class="form-control" type="text" name="dataNasc">
-                                        </div>
-                                    </div>
+                                        <div class="row form-group">
+                                            <div class="col-lg-6">
+                                                <label>Email</label>
+                                                <input class="form-control" type="text" name="email">
+                                            </div>
 
-                                    <div class="row form-group">
-                                        <div class="col-lg-6">
-                                            <label>Email</label>
-                                            <input class="form-control" type="text" name="email">
+                                            <div class="col-lg-6">
+                                                <label>Telefone</label>
+                                                <input class="form-control" type="text" name="telefone">
+                                            </div>
                                         </div>
 
-                                        <div class="col-lg-6">
-                                            <label>Telefone</label>
-                                            <input class="form-control" type="text" name="telefone">
+                                        <div>
+                                            <button id="step_2" class="btn btn-lg btn-info next-step">Próximo Passo</button>
                                         </div>
-                                    </div>
-
-                                    <div>
-                                        <button type="submit" class="btn btn-lg btn-info next-step">Próximo Passo</button>
-                                    </div>
-                                </fieldset>
+                                    </fieldset>
+                                </div>
                             </div>
                         </div>
-                    </form>
+                    <!--</form>-->
 
-                    <form id="step_2" class="form-step" style="display:none">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <div class="panel-title">
-                                    Preencha seus dados para receber contato
+                    <!--<form id="step_2" class="form-step" style="display:none">-->
+                        <div id="step_2" class="form-step" style="display:none">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <div class="panel-title">
+                                        Preencha seus dados para receber contato
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="panel-body">
-                                <fieldset>
-                                    <div class="row form-group">
-                                        <div class="col-lg-6">
-                                            <label>Região</label>
-                                            <select class="form-control" name="regiao">
-                                                <option value="0">Selecione a sua região</option>
-                                                <?php foreach($landing->regiao() as $key => $value){ ?>
-                                                <option value="<?php echo $value->id_regiao; ?>">
-                                                    <?php echo $value->regiao; ?>
-                                                </option>
-                                                <?php } ?>
-                                            </select>
+                                <div class="panel-body">
+                                    <fieldset>
+                                        <div class="row form-group">
+                                            <div class="col-lg-6">
+                                                <label>Região</label>
+                                                <select class="form-control" id="regiao" name="regiao">
+                                                    <option value="0">Selecione a sua região</option>
+                                                    <?php foreach($landing->regiao() as $key => $value){ ?>
+                                                    <option value="<?php echo $value->id_regiao; ?>">
+                                                        <?php echo $value->regiao; ?>
+                                                    </option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                <label>Unidade</label>
+                                                <select class="form-control" id="unidade" name="unidade">
+                                                    <option value="">Selecione a unidade mais próxima</option>
+                                                    
+                                                </select>
+                                            </div>
                                         </div>
 
-                                        <div class="col-lg-6">
-                                            <label>Unidade</label>
-                                            <select class="form-control" name="unidade">
-                                                <option value="">Selecione a unidade mais próxima</option>
-                                                <?php foreach($landing->unidade() as $key => $value){ ?>
-                                                <option value="<?php echo $value->id_unidade; ?>">
-                                                    <?php echo $value->unidade; ?>
-                                                </option>
-                                                <?php } ?>
-                                            </select>
+                                        <div>
+                                            <input type="submit" name="salvar" value="Salvar" class="btn btn-lg btn-info"/>
                                         </div>
-                                    </div>
-
-                                    <div>
-                                        <button type="submit" name="salvar" class="btn btn-lg btn-info next-step">Enviar</button>
-                                    </div>
-                                </fieldset>
+                                    </fieldset>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -162,6 +165,15 @@
                 $('.next-step').click(function (event) {
                     event.preventDefault();
                     $(this).parents('.form-step').hide().next().show();
+                });
+            });
+        </script>
+        <script type="text/javascript">
+            $('#regiao').change(function () {
+                var valor = document.getElementById("regiao").value;
+                $.get('classes/cidade.php?buscar=' + valor, function (data) {
+                    $('#unidade').find("option").remove();
+                    $('#unidade').append(data);
                 });
             });
         </script>

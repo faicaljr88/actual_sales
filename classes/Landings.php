@@ -5,7 +5,8 @@ require_once 'config.php';
 class Landings{
 
 	private $table = 'landing';
-	private $regiao = 'regiao';
+	private $regiao_table = 'regiao';
+	private $unidade_table = 'unidade';
 	
 	private $nome;
 	private $email;
@@ -63,10 +64,10 @@ class Landings{
 			$this->score -= 2;
 		}
 		elseif($regiao == 2){
-			$this->score -= 3;
+			$this->score -= 4;
 		}
 		elseif($regiao == 3){
-			$this->score -= 4;
+			$this->score -= 3;
 		}
 		elseif($regiao == 4){
 			$this->score -= 5;
@@ -78,25 +79,24 @@ class Landings{
 
 	public function calculaIdade($dataNasc){
 		$data = new DateTime( '2016-11-01' );
-		$intervalo = $date->diff( new DateTime( $dataNasc ) );
-
+		$intervalo = $data->diff( new DateTime( $dataNasc ) );
 		$idade = (int)$intervalo->format( '%Y' );
 
-		if($idade < 100 || $idade > 18){
+		if($idade > 100 || $idade < 18){
 			$this->score -= 5;
 		}
-		elseif($idade <= 40 && $idade >= 99){
+		elseif($idade >= 40 && $idade <= 99){
 			$this->score -= 3;
 		}
-		elseif($idade <= 18 && $idade >= 39){
-			$this->score;
+		elseif($idade >= 18 && $idade <= 39){
+			$this->score -= 0;
 		}
 	}
 
 	public function regiao(){
 
 		$sql = "SELECT r.id_regiao , r.nome as regiao 
- 				FROM $this->regiao r";
+ 				FROM $this->regiao_table r";
 		$stmt = DB::prepare($sql);
 		$stmt->execute();
 		return $stmt->fetchAll();
@@ -109,9 +109,9 @@ class Landings{
 		}
 
 		$sql = "SELECT u.id_unidade , u.nome as unidade 
- 				FROM $this->regiao r
- 				INNER JOIN $this->unidade 
- 					ON u.id_unidade = r.id_unidade" . $filtro;;
+ 				FROM $this->regiao_table r
+ 				INNER JOIN $this->unidade_table u 
+ 					ON u.id_regiao = r.id_regiao" . $filtro;
 		$stmt = DB::prepare($sql);
 		$stmt->execute();
 		return $stmt->fetchAll();
