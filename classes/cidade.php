@@ -1,6 +1,6 @@
 <?php
+//require_once 'model/config.php';
 require_once 'Landings.php';
-require_once 'config.php';
 require_once 'DB.php';
 
 if (isset($_GET['buscar'])) {

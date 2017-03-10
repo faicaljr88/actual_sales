@@ -1,6 +1,6 @@
 <?php
 
-require_once 'config.php';
+require_once 'DB.php';
 
 class Landings{
 
@@ -38,7 +38,9 @@ class Landings{
 	}
 
 	public function setDataNasc($dataNasc){
-		$this->dataNasc = $dataNasc;
+		$date = DateTime::createFromFormat('d/m/Y', $dataNasc);
+		$formato = $date->format('Y-m-d');
+		$this->dataNasc = $formato;
 	}
 
 	public function setToken($token){
@@ -59,6 +61,21 @@ class Landings{
 		return $stmt->execute();
 	}
 
+	public function dados(){
+
+		$sql = "SELECT l.token, l.nome, l.email, l.telefone, r.nome as 'regiao', u.nome as 'unidade', l.data_nasc as 'data_nascimento', l.score, l.token
+				FROM $this->table l 
+				INNER JOIN $this->regiao_table r 
+					ON l.id_regiao = r.id_regiao 
+				INNER JOIN $this->unidade_table u 
+					ON l.id_unidade = u.id_unidade 
+				ORDER BY l.id DESC LIMIT 1";
+
+		$stmt = DB::prepare($sql);
+		$stmt->execute();
+		return $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+
 	public function calculaScore($regiao, $unidade = ''){
 		if($regiao == 1){
 			$this->score -= 2;
@@ -72,14 +89,17 @@ class Landings{
 		elseif($regiao == 4){
 			$this->score -= 5;
 		}
-		elseif($regiao == 5 && $unidade != 1){
+		elseif($regiao == 5 && $unidade != 7){
 			$this->score -= 1;
 		}
 	}
 
 	public function calculaIdade($dataNasc){
+		$date = DateTime::createFromFormat('d/m/Y', $dataNasc);
+		$formato = $date->format('Y-m-d');
+
 		$data = new DateTime( '2016-11-01' );
-		$intervalo = $data->diff( new DateTime( $dataNasc ) );
+		$intervalo = $data->diff( new DateTime( $formato ) );
 		$idade = (int)$intervalo->format( '%Y' );
 
 		if($idade > 100 || $idade < 18){
@@ -93,6 +113,31 @@ class Landings{
 		}
 	}
 
+	public function enviaApi(){
+		$dados = $this->dados();
+
+		$url ="http://api.actualsales.com.br/join-asbr/ti/lead";
+		$query = [];
+	
+		foreach ($dados as $param => $value) {
+		   $query[] = $param.'='. $value .'&';
+		}
+
+		$resultado = implode("", $query);
+
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");  
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS,$resultado);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		$resultado = curl_exec($ch);
+		
+		curl_close($ch);
+
+		return $resultado;
+	}
+
 	public function regiao(){
 
 		$sql = "SELECT r.id_regiao , r.nome as regiao 
@@ -102,7 +147,7 @@ class Landings{
 		return $stmt->fetchAll();
 	}
 
-	public function unidade($regiao = ''){
+	public function unidade($regiao){
 
 		if(isset($regiao) && $regiao != ''){
 			$filtro = " WHERE r.id_regiao = " . $regiao . "";
@@ -114,6 +159,7 @@ class Landings{
  					ON u.id_regiao = r.id_regiao" . $filtro;
 		$stmt = DB::prepare($sql);
 		$stmt->execute();
+
 		return $stmt->fetchAll();
 	}
 }

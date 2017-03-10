@@ -1,5 +1,4 @@
 <?php
-    //error_reporting(0);
     spl_autoload_register(function($class_name){
         require_once 'classes/' . $class_name . '.php';
     });
@@ -12,6 +11,8 @@
         <title>Compre Já</title>
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+        <script src="assets/js/mascara.js"></script>
+        <script src="http://digitalbush.com/wp-content/uploads/2014/10/jquery.maskedinput.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     </head>
     <body>
@@ -39,10 +40,8 @@
             $landing->calculaScore($regiao, $unidade);
             $landing->calculaIdade($dataNasc);
             $landing->salvar();
+            $landing->enviaApi();
         }
-        /*
-
-        */
     ?>
             <div class="row" style="margin:30px 0">
                 <div class="col-lg-3">
@@ -70,12 +69,12 @@
                                         <div class="row form-group">
                                             <div class="col-lg-6">
                                                 <label>Nome Completo</label>
-                                                <input class="form-control" type="text" name="nome">
+                                                <input class="form-control nome" type="text" name="nome">
                                             </div>
 
                                             <div class="col-lg-6">
                                                 <label>Data de Nascimento</label>
-                                                <input class="form-control" type="text" name="dataNasc">
+                                                <input class="form-control dataNasc" type="text" name="dataNasc">
                                             </div>
                                         </div>
 
@@ -139,8 +138,6 @@
                                 </div>
                             </div>
                         </div>
-                    </form>
-
                     <div id="step_sucesso" class="form-step" style="display:none">
                         <div class="panel panel-info">
                             <div class="panel-heading">
@@ -158,6 +155,7 @@
                     <h1>Chamada interessante para o produto</h1>
                     <h2>Mais uma informação relevante</h2>
                 </div>
+            </form>
             </div>
         </div>
         <script>
@@ -166,6 +164,11 @@
                     event.preventDefault();
                     $(this).parents('.form-step').hide().next().show();
                 });
+            });
+            $(document).ready(function(){
+                $('.dataNasc').mask('99/99/9999');
+                $('.nome').filter_input({regex:'[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]'});
+
             });
         </script>
         <script type="text/javascript">

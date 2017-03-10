@@ -1,0 +1,62 @@
+Criação da base de dados.
+CREATE DATABASE actual_sales;
+
+Criação das tabela com as regiões 
+CREATE  TABLE IF NOT EXISTS `actual_sales`.`regiao` (
+  `id_regiao` INT NOT NULL AUTO_INCREMENT ,
+  `nome` VARCHAR(100) NULL ,
+  PRIMARY KEY (`id_regiao`) )
+ENGINE = InnoDB;
+
+INSERT INTO `regiao` (`id_regiao`, `nome`) VALUES (NULL, 'Sul');
+INSERT INTO `regiao` (`id_regiao`, `nome`) VALUES (NULL, 'Nordeste');
+INSERT INTO `regiao` (`id_regiao`, `nome`) VALUES (NULL, 'Centro-Oeste');
+INSERT INTO `regiao` (`id_regiao`, `nome`) VALUES (NULL, 'Norte');
+INSERT INTO `regiao` (`id_regiao`, `nome`) VALUES (NULL, 'Sudeste');
+
+Criação da tabela com as Unidades
+CREATE  TABLE IF NOT EXISTS `actual_sales`.`unidade` (
+  `id_unidade` INT NOT NULL AUTO_INCREMENT ,
+  `nome` VARCHAR(45) NULL ,
+  `id_regiao` INT NOT NULL ,
+  PRIMARY KEY (`id_unidade`) ,
+  INDEX `fk_unidade_regiao1_idx` (`id_regiao` ASC) ,
+  CONSTRAINT `fk_unidade_regiao1`
+    FOREIGN KEY (`id_regiao` )
+    REFERENCES `actual_sales`.`regiao` (`id_regiao` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+INSERT INTO `unidade` (`id_unidade`, `nome`, `id_regiao`) VALUES (NULL, 'Curitiba', '1');
+INSERT INTO `unidade` (`id_unidade`, `nome`, `id_regiao`) VALUES (NULL, 'Porto Alegre', '1');
+INSERT INTO `unidade` (`id_unidade`, `nome`, `id_regiao`) VALUES (NULL, 'Salvador', '2');
+INSERT INTO `unidade` (`id_unidade`, `nome`, `id_regiao`) VALUES (NULL, 'Recife', '2');
+INSERT INTO `unidade` (`id_unidade`, `nome`, `id_regiao`) VALUES (NULL, 'Brasília', '3');
+INSERT INTO `unidade` (`id_unidade`, `nome`, `id_regiao`) VALUES (NULL, 'INDISPONÍVEL
+', '4');
+INSERT INTO `unidade` (`id_unidade`, `nome`, `id_regiao`) VALUES (NULL, 'São Paulo', '5');
+INSERT INTO `unidade` (`id_unidade`, `nome`, `id_regiao`) VALUES (NULL, 'Rio de Janeiro
+', '5');
+INSERT INTO `unidade` (`id_unidade`, `nome`, `id_regiao`) VALUES (NULL, 'Belo Horizonte', '5');
+
+
+Criação da Tabela para os Leads
+CREATE  TABLE IF NOT EXISTS `actual_sales`.`landing` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `nome` VARCHAR(100) NULL ,
+  `email` VARCHAR(100) NULL ,
+  `data_nasc` DATE NULL ,
+  `telefone` VARCHAR(45) NULL ,
+  `score` INT NULL ,
+  `token` VARCHAR(100) NULL ,
+  `id_regiao` INT NOT NULL ,
+  `id_unidade` INT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_landing_regiao_idx` (`id_regiao` ASC) ,
+  CONSTRAINT `fk_landing_regiao`
+    FOREIGN KEY (`id_regiao` )
+    REFERENCES `actual_sales`.`regiao` (`id_regiao` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
